@@ -9,6 +9,10 @@ $(document).ready(() => {
     }
   })
 
+  $('.list').on('click', 'li', function() {
+    updateTodo($(this));
+  })
+
   $('.list').on('click', 'span', function(e) {
     e.stopPropagation();
     removeTodo($(this).parent());
@@ -25,6 +29,7 @@ const addTodos = todos => {
 const addTodo = todo => {
   var newTodo = $(`<li data-attr class='task'>${todo.name} <span>x</span></li>`);
   newTodo.data('id', todo._id);
+  newTodo.data('completed', todo.completed)
   if (todo.completed) {
     newTodo.addClass('done');
   }
@@ -57,4 +62,22 @@ const removeTodo = todo => {
     .catch(err => {
       console.log(err);
     })
+}
+
+const updateTodo = todo => {
+  const updateUrl = `/api/todos/${todo.data('id')}`;
+  const isDone = !todo.data('completed');
+  const updateData = {completed: isDone};
+  $.ajax({
+      method: 'PUT',
+      url: updateUrl,
+      data: updateData
+    })
+    .then(updatedTodo => {
+      todo.toggleClass('done');
+      todo.data('completed', isDone);
+    })
+    .catch(err => {
+      console.log(err);
+  })
 }
